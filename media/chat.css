@@ -916,6 +916,13 @@ button {
 }
 .usage-chip.warn .usage-progress { stroke: #e6b84d; }
 .usage-chip.critical .usage-progress { stroke: var(--danger); }
+.usage-cost {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.usage-cost-key { opacity: 0.6; }
 .usage-label {
   min-width: 28px;
   font-variant-numeric: tabular-nums;

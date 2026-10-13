@@ -26,6 +26,7 @@
   const greetingTitle = document.getElementById("greetingTitle");
   const usageBtn = document.getElementById("usageBtn");
   const usageLabel = document.getElementById("usageLabel");
+  const costLabel = document.getElementById("costLabel");
   const usageProgress = document.getElementById("usageProgress");
   const tabsEl = document.getElementById("tabs");
   const suggestEl = document.getElementById("suggest");
@@ -1439,6 +1440,9 @@
   function updateUsage() {
     const usage = state.contextUsage;
     if (usageLabel == null || usageBtn == null) return;
+    if (costLabel) {
+      costLabel.textContent = "$" + (usage && typeof usage.cost === "number" ? usage.cost : 0).toFixed(2);
+    }
     if (usage == null || !usage.contextWindow) {
       usageLabel.textContent = "0%";
       usageBtn.title = "Context usage this session";

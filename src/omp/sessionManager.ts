@@ -1192,6 +1192,7 @@ export class SessionManager {
           });
           this.applyAssistantTimingMeta(event.message);
         }
+        this.addTurnCost(event.message);
         break;
       case "agent_end":
         this.markTurnComplete();
@@ -1363,6 +1364,15 @@ export class SessionManager {
     }
   }
 
+  private addTurnCost(message: unknown): void {
+    const total = (message as { usage?: { cost?: { total?: unknown } } } | undefined)?.usage?.cost?.total;
+    if (typeof total !== "number" || !Number.isFinite(total) || !this.contextUsage) {
+      return;
+    }
+    this.contextUsage = { ...this.contextUsage, cost: (this.contextUsage.cost ?? 0) + total };
+    this.notify();
+  }
+
   private parseContextUsage(raw: unknown, fallbackWindow?: number): ContextUsage | null {
     if (!raw || typeof raw !== "object") {
       if (fallbackWindow && fallbackWindow > 0) {
@@ -1494,7 +1504,11 @@ export class SessionManager {
         (typeof (modelRaw as { contextWindow?: number } | undefined)?.contextWindow === "number"
           ? (modelRaw as { contextWindow: number }).contextWindow
           : undefined);
-      this.contextUsage = this.parseContextUsage(state.contextUsage, fallbackWindow);
+      const parsedUsage = this.parseContextUsage(state.contextUsage, fallbackWindow);
+      const stats = await this.client.request({ type: "get_session_stats" }).catch(() => undefined);
+      const cost = (stats?.data as { cost?: unknown } | undefined)?.cost;
+      this.contextUsage =
+        parsedUsage && typeof cost === "number" ? { ...parsedUsage, cost } : parsedUsage;
       this.notify();
     } catch (err) {
       // Non-fatal: UI can keep the last known usage.

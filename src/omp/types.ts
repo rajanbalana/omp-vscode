@@ -82,6 +82,8 @@ export interface ContextUsage {
   contextWindow: number;
   /** Percentage of the context window used (0-100). */
   percent: number;
+  /** Accumulated session cost in USD, when reported by omp. */
+  cost?: number;
 }
 
 export interface ChatTabInfo {

@@ -546,6 +546,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 <circle id="usageProgress" class="usage-progress" cx="14" cy="14" r="11"></circle>
               </svg>
               <span id="usageLabel" class="usage-label">0%</span>
+              <span class="usage-cost" title="Session cost"><span class="usage-cost-key">cost</span> <span id="costLabel">$0.00</span></span>
             </button>
           </div>
           <div class="right-actions">
