@@ -294,7 +294,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         });
         break;
       case "openFile": {
-        const uri = this.resolveWorkspaceUri(msg.path);
+        const uri = await this.resolveWorkspaceUri(msg.path);
         if (!uri) {
           vscode.window.showWarningMessage(`Could not open ${msg.path}`);
           break;
@@ -336,7 +336,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private resolveWorkspaceUri(pathValue: string): vscode.Uri | undefined {
+  private async resolveWorkspaceUri(pathValue: string): Promise<vscode.Uri | undefined> {
     let value = String(pathValue || "").trim();
     if (!value) {
       return undefined;
@@ -365,11 +365,17 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     if (value.startsWith("/") || /^[A-Za-z]:[\\/]/.test(value)) {
       return vscode.Uri.file(value);
     }
-    const folder = vscode.workspace.workspaceFolders?.[0];
-    if (!folder) {
-      return undefined;
+    const folders = vscode.workspace.workspaceFolders ?? [];
+    for (const folder of folders) {
+      const candidate = vscode.Uri.joinPath(folder.uri, value);
+      try {
+        await vscode.workspace.fs.stat(candidate);
+        return candidate;
+      } catch {
+        // not in this folder; try the next one
+      }
     }
-    return vscode.Uri.joinPath(folder.uri, value);
+    return folders[0] ? vscode.Uri.joinPath(folders[0].uri, value) : undefined;
   }
 
   private currentModelLabel(): string {
