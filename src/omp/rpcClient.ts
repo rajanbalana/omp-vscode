@@ -45,6 +45,9 @@ export class OmpRpcClient extends EventEmitter {
     this.started = true;
 
     const args = ["--mode", "rpc", "--cwd", this.options.cwd];
+    for (const dir of this.options.addDirs ?? []) {
+      args.push("--add-dir", dir);
+    }
     if (this.options.model) {
       args.push("--model", this.options.model);
     }

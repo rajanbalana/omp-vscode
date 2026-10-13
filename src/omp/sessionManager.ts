@@ -234,11 +234,19 @@ export class SessionManager {
     this._onDidChange.fire();
   }
 
+  private getAdditionalWorkspaceDirs(): string[] {
+    const cwd = this.getWorkspaceCwd();
+    return (vscode.workspace.workspaceFolders ?? [])
+      .map((folder) => folder.uri.fsPath)
+      .filter((fsPath) => fsPath !== cwd);
+  }
+
   private readConfig(overrides?: Partial<OmpClientOptions>): OmpClientOptions {
     const cfg = vscode.workspace.getConfiguration("ompChat");
     return {
       ompPath: cfg.get<string>("ompPath", "omp") || "omp",
       cwd: this.getWorkspaceCwd(),
+      addDirs: this.getAdditionalWorkspaceDirs(),
       model: cfg.get<string>("model", "") || undefined,
       thinking: cfg.get<string>("thinking", "") || undefined,
       approvalMode: cfg.get<string>("approvalMode", "") || undefined,

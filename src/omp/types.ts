@@ -228,6 +228,8 @@ export interface AssistantMessageEvent {
 export interface OmpClientOptions {
   ompPath: string;
   cwd: string;
+  /** Extra workspace directories passed as repeated --add-dir flags. */
+  addDirs?: string[];
   model?: string;
   thinking?: string;
   approvalMode?: string;
